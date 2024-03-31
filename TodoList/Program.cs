@@ -1,7 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using TodoList.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<TodoListDataContext>(
+    optionsBuilder => optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("TodoListDb"))
+);
 
 var app = builder.Build();
 
