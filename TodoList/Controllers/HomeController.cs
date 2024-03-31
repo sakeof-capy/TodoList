@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using TodoList.Data.Application;
 using TodoList.Models;
 
 namespace TodoList.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly TodoListDataContext todoListDataContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(TodoListDataContext todoListDataContext)
         {
-            _logger = logger;
+            this.todoListDataContext = todoListDataContext;
         }
 
         public IActionResult Index()
