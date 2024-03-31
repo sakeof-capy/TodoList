@@ -8,6 +8,7 @@ public class TodoListUser
 
     [Required(ErrorMessage = "Email is a required field of TodoListUser")]
     [StringLength(320, ErrorMessage = "Email cannot be more than 320 characters long.")]
+    [EmailAddress]
     public string? Email { get; set; }
 
     [Required(ErrorMessage = "Password is a required field of TodoListUser")]
