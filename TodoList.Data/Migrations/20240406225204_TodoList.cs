@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TodoList.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class TodoListMigration : Migration
+    public partial class TodoList : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,6 +18,7 @@ namespace TodoList.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    OwnerEmail = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
                     Title = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     DueDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
@@ -32,14 +33,12 @@ namespace TodoList.Data.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
                     Password = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Email);
                 });
         }
 
