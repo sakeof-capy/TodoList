@@ -12,8 +12,8 @@ using TodoList.Data.Application;
 namespace TodoList.Data.Migrations
 {
     [DbContext(typeof(TodoListDataContext))]
-    [Migration("20240331133426_TodoListMigration")]
-    partial class TodoListMigration
+    [Migration("20240406225204_TodoList")]
+    partial class TodoList
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,11 @@ namespace TodoList.Data.Migrations
                     b.Property<bool>("IsComplete")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("OwnerEmail")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -55,14 +60,7 @@ namespace TodoList.Data.Migrations
 
             modelBuilder.Entity("TodoList.Data.Domain.TodoListUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(320)
                         .HasColumnType("character varying(320)");
 
@@ -71,7 +69,7 @@ namespace TodoList.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Email");
 
                     b.ToTable("Users");
                 });

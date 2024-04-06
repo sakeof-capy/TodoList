@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using TodoList.Data.Application;
 using TodoList.Data.Domain;
+
+namespace TodoList.Controllers;
 
 public class UserController : Controller
 {
@@ -13,38 +17,64 @@ public class UserController : Controller
         _logger = logger;
     }
 
+    [HttpGet]
     public IActionResult Index()
     {
         var users = _context.Users.ToList();
+        _logger.Log(LogLevel.Information, "Index called");
         return View(users);
     }
 
+    [HttpGet]
     public IActionResult Create()
     {
         return View();
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public IActionResult Create(TodoListUser user)
     {
         if (ModelState.IsValid)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _context.Users.Add(user);
+                _context.SaveChanges();
+                _logger.Log(LogLevel.Information, "Model is valid, user added");
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException is Npgsql.PostgresException postgresException && postgresException.SqlState == "23505")
+                {
+                    ModelState.AddModelError("Email", "Email address is already in use.");
+                }
+                else
+                {
+                    _logger.LogError($"Error saving user: {ex.Message}");
+                }
+            }
         }
+
         return View(user);
     }
 
-    public IActionResult Edit(int? id)
+    [HttpGet]
+    public IActionResult GetUser(string email)
     {
-        if (id == null)
+        var user = _context.Users.Find(email);
+        return user != null ? Ok(user) : NotFound();
+    }
+
+    [HttpGet]
+    public IActionResult Edit(string? email)
+    {
+        if (email == null)
         {
             return NotFound();
         }
 
-        var user = _context.Users.Find(id);
+        var user = _context.Users.Find(email);
         if (user == null)
         {
             return NotFound();
@@ -54,11 +84,11 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, TodoListUser user)
+    public IActionResult Edit(string email, TodoListUser user)
     {
-        if (id != user.Id)
+        if (email != user.Email)
         {
+            _logger.Log(LogLevel.Information, "Error: Trying to edit a wrong user: id mismatch");
             return NotFound();
         }
 
@@ -66,19 +96,34 @@ public class UserController : Controller
         {
             _context.Update(user);
             _context.SaveChanges();
+            _logger.Log(LogLevel.Information, "Model is valid, user edited");
             return RedirectToAction(nameof(Index));
         }
-        return View(user);
+        else
+        {
+            foreach (var modelStateEntry in ModelState.Values)
+            {
+                foreach (var error in modelStateEntry.Errors)
+                {
+                    _logger.LogError($"ModelState Error: {error.ErrorMessage}");
+                }
+            }
+
+            _logger.LogError("Invalid model: " + JsonConvert.SerializeObject(user));
+
+            return View(user);
+        }
     }
 
-    public IActionResult Delete(int? id)
+    [HttpGet]
+    public IActionResult Delete(string? email)
     {
-        if (id == null)
+        if (email == null)
         {
             return NotFound();
         }
 
-        var user = _context.Users.Find(id);
+        var user = _context.Users.Find(email);
         if (user == null)
         {
             return NotFound();
@@ -87,13 +132,13 @@ public class UserController : Controller
         return View(user);
     }
 
+
     [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public IActionResult DeleteConfirmed(int id)
+    public IActionResult DeleteConfirmed(TodoListUser user)
     {
-        var user = _context.Users.Find(id);
         _context.Users.Remove(user);
         _context.SaveChanges();
+        _logger.Log(LogLevel.Information, "Deleted");
         return RedirectToAction(nameof(Index));
     }
 }

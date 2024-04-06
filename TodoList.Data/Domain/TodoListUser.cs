@@ -4,8 +4,7 @@ namespace TodoList.Data.Domain;
 
 public class TodoListUser
 {
-    public int Id { get; set; }
-
+    [Key]
     [Required(ErrorMessage = "Email is a required field of TodoListUser")]
     [StringLength(320, ErrorMessage = "Email cannot be more than 320 characters long.")]
     [EmailAddress]
