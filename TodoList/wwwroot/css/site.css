@@ -1,22 +1,112 @@
-html {
-  font-size: 14px;
+body, html {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+header {
+  height: 12.5%;
+  background-color: #9E7DF2;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.container.centered {
+  display: flex;
+  height: 100%;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.left-panel, .right-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
+.left-panel {
+  width: 60%;
+  background: url('../css/signIn.jpg') no-repeat center center;
+  background-size: 80%;
+}
+
+.right-panel {
+  width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #9E7DF2;
+}
+
+.login-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #9E7DF2;
+}
+
+.login-card {
+  font-family: 'Lexend', sans-serif;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.btn-primary, .btn-secondary {
+  font-size: 100%;
+  font-family: 'Lexend', sans-serif;
+  background-color: white;
+  color: #9E7DF2;
+  border-radius: 0.25em;
+  border: 1px solid white;
+  padding: 12px 20px;
+  width: 10vw;
+  box-sizing: border-box;
+  text-align: center; /* Ensures text is centered */
+  display: block; /* Make the buttons block level so width applies */
+  margin: 0 auto; /* Center the buttons horizontally */
+}
+
+.btn-secondary {
+  background-color: #9E7DF2;
+  color: white;
+}
+
+.welcome-title {
+  font-family: 'Lexend', sans-serif;
+  font-size: 250%;
+}
+
+.label-email, .label-password {
+  font-family: 'Lexend', sans-serif;
+  font-weight: lighter;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.login-form {
+  width: 90%;
+  margin: auto;
+}
+
+.form-control {
+  font-size: 150%;
+  border-radius: 0.25em;
+  border: 1px solid white;
+  padding: 12px 20px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 3vh;
+  margin-left: 1.5vw;
+}
+
+.separator-line {
+  width: 15vw;
+  height: 1px;
+  background-color: white;
+  margin: 5vh 0; /* Adjusted to apply vertical margin */
 }

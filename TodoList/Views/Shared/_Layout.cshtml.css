@@ -1,26 +1,28 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
-
-a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+﻿.custom-navbar {
+  background-color: #5957D5;
+  height: 10vh; /* Header takes 1/10 of the height */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
 }
 
-a {
-  color: #0077cc;
+.navbar-logo {
+  background-color: #5957D5;
+  width: 50px; /* Logo size */
+  height: 50px; /* Logo size */
+  border-radius: 50%; /* Makes it a circle */
+  display: inline-block;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.navbar-logo:hover {
+  background-color: darken(blue, 10%); /* Darkens the logo on hover */
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+/* Styles for the main container */
+.main-container {
+  min-height: 90vh; /* Remaining height */
+  background-color:#5957D5
 }
 
 .border-top {
