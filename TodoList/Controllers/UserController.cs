@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using TodoList.Data.Application;
 using TodoList.Data.Domain;
 using TodoList.Data.JWT;
+using TodoList.Models;
 
 namespace TodoList.Controllers;
 
@@ -56,10 +57,16 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(TodoListUser user)
+    public async Task<IActionResult> Create(UserViewModel inputUser)
     {
         if (ModelState.IsValid)
         {
+            var user = new TodoListUser
+            {
+                Email = inputUser.Email,
+                Password = inputUser.Password,
+            };
+
             try
             {
                 _context.Users.Add(user);
@@ -79,7 +86,7 @@ public class UserController : Controller
             }
         }
 
-        return View(user);
+        return View(inputUser);
     }
 
     [HttpGet]
@@ -107,9 +114,9 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(string email, TodoListUser user)
+    public async Task<IActionResult> Edit(string email, UserViewModel inputUser)
     {
-        if (email != user.Email)
+        if (email != inputUser.Email)
         {
             _logger.LogError("Error: Trying to edit a wrong user: id mismatch");
             return NotFound();
@@ -117,6 +124,12 @@ public class UserController : Controller
 
         if (ModelState.IsValid)
         {
+            var user = new TodoListUser
+            {
+                Email = inputUser.Email,
+                Password = inputUser.Password,
+            };
+
             _context.Update(user);
             await _context.SaveChangesAsync();
             _logger.LogInformation("Model is valid, user edited");
@@ -132,9 +145,9 @@ public class UserController : Controller
                 }
             }
 
-            _logger.LogError("Invalid model: " + JsonConvert.SerializeObject(user));
+            _logger.LogError("Invalid model: " + JsonConvert.SerializeObject(inputUser));
 
-            return View(user);
+            return View(inputUser);
         }
     }
 
@@ -147,6 +160,7 @@ public class UserController : Controller
         }
 
         var user = await _context.Users.FindAsync(email);
+
         if (user == null)
         {
             return NotFound();
@@ -157,11 +171,18 @@ public class UserController : Controller
 
 
     [HttpPost, ActionName("Delete")]
-    public async Task<IActionResult> DeleteConfirmed(TodoListUser user)
+    public async Task<IActionResult> DeleteConfirmed(UserViewModel inputUser)
     {
+        var user = new TodoListUser
+        {
+            Email = inputUser.Email,
+            Password = inputUser.Password,
+        };
+
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
         _logger.Log(LogLevel.Information, "Deleted");
+
         return RedirectToAction(nameof(Index));
     }
 }
