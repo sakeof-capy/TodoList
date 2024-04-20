@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TodoList.Data.Application;
 using TodoList.Data.Domain;
+using TodoList.Models;
 
 namespace TodoList.Controllers;
 
@@ -32,16 +34,31 @@ public class TaskController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(TodoListTask task)
+    public IActionResult Create(TaskViewModel inputTask)
     {
         if (ModelState.IsValid)
         {
+            var currentUserClaims = HttpContext.User.Claims;
+            string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("Email claim not found in JWT token.");
+            }
+
+            var task = new TodoListTask
+            {
+                OwnerEmail = userEmail,
+                Title = inputTask.Title,
+                Description = inputTask.Description,
+                DueDate = DateTime.Now.ToUniversalTime(),
+                IsComplete = inputTask.IsComplete,
+            };
+
             try
             {
-                task.DueDate = DateTime.Now.ToUniversalTime();
                 _context.Tasks.Add(task);
                 _context.SaveChanges();
-                _logger.Log(LogLevel.Information, "Model is valid, user added");
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)
