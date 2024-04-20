@@ -21,9 +21,9 @@ public class TaskController : Controller
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var users = _context.Tasks.ToList();
+        var users = await _context.Tasks.ToListAsync();
         return View(users);
     }
 
@@ -34,7 +34,7 @@ public class TaskController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(TaskViewModel inputTask)
+    public async Task<IActionResult> Create(TaskViewModel inputTask)
     {
         if (ModelState.IsValid)
         {
@@ -58,7 +58,7 @@ public class TaskController : Controller
             try
             {
                 _context.Tasks.Add(task);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)
@@ -78,9 +78,9 @@ public class TaskController : Controller
     }
 
     [HttpGet]
-    public IActionResult Edit(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        var task = _context.Tasks.Find(id);
+        var task = await _context.Tasks.FindAsync(id);
         if (task == null)
         {
             return NotFound();
@@ -90,7 +90,7 @@ public class TaskController : Controller
     }
 
     [HttpPost]
-    public IActionResult Edit(int id, TodoListTask task)
+    public async Task<IActionResult> Edit(int id, TodoListTask task)
     {
         if (id != task.Id)
         {
@@ -102,8 +102,7 @@ public class TaskController : Controller
             try
             {
                 _context.Update(task);
-                _context.SaveChanges();
-                _logger.Log(LogLevel.Information, "Task updated successfully");
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException ex)
@@ -116,9 +115,9 @@ public class TaskController : Controller
     }
 
     [HttpGet]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var task = _context.Tasks.Find(id);
+        var task = await _context.Tasks.FindAsync(id);
         if (task == null)
         {
             return NotFound();
@@ -128,10 +127,10 @@ public class TaskController : Controller
     }
 
     [HttpPost]
-    public IActionResult DeleteConfirmed(TodoListTask task)
+    public async Task<IActionResult> DeleteConfirmed(TodoListTask task)
     {
         _context.Tasks.Remove(task);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 }

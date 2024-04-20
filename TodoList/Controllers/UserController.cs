@@ -35,7 +35,7 @@ public class UserController : Controller
 
         if (user == null)
         {
-            return Unauthorized("Invalid email or password.");
+            return RedirectToAction(nameof(Index)); // TODO: notify about the error login
         }
 
         var token = JWTManager.GenerateJwtToken(user);
@@ -56,15 +56,14 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(TodoListUser user)
+    public async Task<IActionResult> Create(TodoListUser user)
     {
         if (ModelState.IsValid)
         {
             try
             {
                 _context.Users.Add(user);
-                _context.SaveChanges();
-                _logger.Log(LogLevel.Information, "Model is valid, user added");
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)
@@ -84,21 +83,21 @@ public class UserController : Controller
     }
 
     [HttpGet]
-    public IActionResult GetUser(string email)
+    public async Task<IActionResult> GetUser(string email)
     {
-        var user = _context.Users.Find(email);
+        var user = await _context.Users.FindAsync(email);
         return user != null ? Ok(user) : NotFound();
     }
 
     [HttpGet]
-    public IActionResult Edit(string? email)
+    public async Task<IActionResult> Edit(string? email)
     {
         if (email == null)
         {
             return NotFound();
         }
 
-        var user = _context.Users.Find(email);
+        var user = await _context.Users.FindAsync(email);
         if (user == null)
         {
             return NotFound();
@@ -108,19 +107,19 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public IActionResult Edit(string email, TodoListUser user)
+    public async Task<IActionResult> Edit(string email, TodoListUser user)
     {
         if (email != user.Email)
         {
-            _logger.Log(LogLevel.Information, "Error: Trying to edit a wrong user: id mismatch");
+            _logger.LogError("Error: Trying to edit a wrong user: id mismatch");
             return NotFound();
         }
 
         if (ModelState.IsValid)
         {
             _context.Update(user);
-            _context.SaveChanges();
-            _logger.Log(LogLevel.Information, "Model is valid, user edited");
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Model is valid, user edited");
             return RedirectToAction(nameof(Index));
         }
         else
@@ -140,14 +139,14 @@ public class UserController : Controller
     }
 
     [HttpGet]
-    public IActionResult Delete(string? email)
+    public async Task<IActionResult> Delete(string? email)
     {
         if (email == null)
         {
             return NotFound();
         }
 
-        var user = _context.Users.Find(email);
+        var user = await _context.Users.FindAsync(email);
         if (user == null)
         {
             return NotFound();
@@ -158,10 +157,10 @@ public class UserController : Controller
 
 
     [HttpPost, ActionName("Delete")]
-    public IActionResult DeleteConfirmed(TodoListUser user)
+    public async Task<IActionResult> DeleteConfirmed(TodoListUser user)
     {
         _context.Users.Remove(user);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         _logger.Log(LogLevel.Information, "Deleted");
         return RedirectToAction(nameof(Index));
     }
