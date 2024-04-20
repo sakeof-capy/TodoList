@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -23,8 +24,17 @@ public class TaskController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var users = await _context.Tasks.ToListAsync();
-        return View(users);
+        var currentUserClaims = HttpContext.User.Claims;
+        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized("Email claim not found in JWT token.");
+        }
+
+        var tasks = await _context.Tasks.Where(t => t.OwnerEmail == userEmail).ToListAsync();
+
+        return View(tasks);
     }
 
     [HttpGet]
@@ -80,25 +90,39 @@ public class TaskController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var task = await _context.Tasks.FindAsync(id);
-        if (task == null)
+        var dbTask = await _context.Tasks.FindAsync(id);
+
+        if (dbTask == null)
         {
             return NotFound();
         }
+
+        var task = new TaskViewModel
+        {
+            Title = dbTask.Title,
+            Description = dbTask.Description,
+            IsComplete = dbTask.IsComplete,
+        };
 
         return View(task);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(int id, TodoListTask task)
+    public async Task<IActionResult> Edit(int id, TaskViewModel inputTask)
     {
-        if (id != task.Id)
-        {
-            return NotFound();
-        }
-
         if (ModelState.IsValid)
         {
+            var task = await _context.Tasks.FindAsync(id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task.Title = inputTask.Title;
+            task.Description = inputTask.Description;
+            task.IsComplete = inputTask.IsComplete;
+
             try
             {
                 _context.Update(task);
@@ -111,7 +135,7 @@ public class TaskController : Controller
             }
         }
 
-        return View(task);
+        return View(inputTask);
     }
 
     [HttpGet]
