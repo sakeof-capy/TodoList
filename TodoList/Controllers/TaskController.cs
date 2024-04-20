@@ -1,9 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TodoList.Data.Application;
 using TodoList.Data.Domain;
+using TodoList.Models;
 
 namespace TodoList.Controllers;
+
+[Authorize]
 public class TaskController : Controller
 {
     private readonly TodoListDataContext _context;
@@ -16,10 +22,19 @@ public class TaskController : Controller
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var users = _context.Tasks.ToList();
-        return View(users);
+        var currentUserClaims = HttpContext.User.Claims;
+        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized("Email claim not found in JWT token.");
+        }
+
+        var tasks = await _context.Tasks.Where(t => t.OwnerEmail == userEmail).ToListAsync();
+
+        return View(tasks);
     }
 
     [HttpGet]
@@ -29,16 +44,31 @@ public class TaskController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(TodoListTask task)
+    public async Task<IActionResult> Create(TaskViewModel inputTask)
     {
         if (ModelState.IsValid)
         {
+            var currentUserClaims = HttpContext.User.Claims;
+            string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized("Email claim not found in JWT token.");
+            }
+
+            var task = new TodoListTask
+            {
+                OwnerEmail = userEmail,
+                Title = inputTask.Title,
+                Description = inputTask.Description,
+                DueDate = DateTime.Now.ToUniversalTime(),
+                IsComplete = inputTask.IsComplete,
+            };
+
             try
             {
-                task.DueDate = DateTime.Now.ToUniversalTime();
                 _context.Tasks.Add(task);
-                _context.SaveChanges();
-                _logger.Log(LogLevel.Information, "Model is valid, user added");
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)
@@ -58,32 +88,45 @@ public class TaskController : Controller
     }
 
     [HttpGet]
-    public IActionResult Edit(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        var task = _context.Tasks.Find(id);
-        if (task == null)
+        var dbTask = await _context.Tasks.FindAsync(id);
+
+        if (dbTask == null)
         {
             return NotFound();
         }
+
+        var task = new TaskViewModel
+        {
+            Title = dbTask.Title,
+            Description = dbTask.Description,
+            IsComplete = dbTask.IsComplete,
+        };
 
         return View(task);
     }
 
     [HttpPost]
-    public IActionResult Edit(int id, TodoListTask task)
+    public async Task<IActionResult> Edit(int id, TaskViewModel inputTask)
     {
-        if (id != task.Id)
-        {
-            return NotFound();
-        }
-
         if (ModelState.IsValid)
         {
+            var task = await _context.Tasks.FindAsync(id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task.Title = inputTask.Title;
+            task.Description = inputTask.Description;
+            task.IsComplete = inputTask.IsComplete;
+
             try
             {
                 _context.Update(task);
-                _context.SaveChanges();
-                _logger.Log(LogLevel.Information, "Task updated successfully");
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException ex)
@@ -92,13 +135,13 @@ public class TaskController : Controller
             }
         }
 
-        return View(task);
+        return View(inputTask);
     }
 
     [HttpGet]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var task = _context.Tasks.Find(id);
+        var task = await _context.Tasks.FindAsync(id);
         if (task == null)
         {
             return NotFound();
@@ -108,10 +151,10 @@ public class TaskController : Controller
     }
 
     [HttpPost]
-    public IActionResult DeleteConfirmed(TodoListTask task)
+    public async Task<IActionResult> DeleteConfirmed(TodoListTask task)
     {
         _context.Tasks.Remove(task);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 }
