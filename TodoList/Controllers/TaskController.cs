@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Data.Application;
 using TodoList.Data.Domain;
 
 namespace TodoList.Controllers;
+
+[Authorize]
 public class TaskController : Controller
 {
     private readonly TodoListDataContext _context;

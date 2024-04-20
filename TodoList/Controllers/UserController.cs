@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TodoList.Data.Application;
 using TodoList.Data.Domain;
+using TodoList.Data.JWT;
 
 namespace TodoList.Controllers;
 
+[Authorize]
 public class UserController : Controller
 {
     private readonly TodoListDataContext _context;
@@ -18,11 +21,32 @@ public class UserController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Index()
     {
-        var users = _context.Users.ToList();
-        _logger.Log(LogLevel.Information, "Index called");
-        return View(users);
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login(string email, string password)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+
+        if (user == null)
+        {
+            return Unauthorized("Invalid email or password.");
+        }
+
+        var token = JWTManager.GenerateJwtToken(user);
+
+        Response.Cookies.Append(JWTManager.TOKEN_COOKIES_KEY, token, new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = DateTime.UtcNow.AddHours(JWTManager.TOKEN_EXPIRATION_HOURS)
+        });
+
+        return RedirectToAction("Index", "Task");
     }
 
     [HttpGet]
