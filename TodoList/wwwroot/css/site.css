@@ -58,9 +58,9 @@ header {
   padding: 12px 20px;
   width: 10vw;
   box-sizing: border-box;
-  text-align: center; /* Ensures text is centered */
-  display: block; /* Make the buttons block level so width applies */
-  margin: 0 auto; /* Center the buttons horizontally */
+  text-align: center;
+  display: block;
+  margin: 0 auto;
 }
 
 .btn-secondary {
@@ -108,5 +108,254 @@ header {
   width: 15vw;
   height: 1px;
   background-color: white;
-  margin: 5vh 0; /* Adjusted to apply vertical margin */
+  margin: 5vh 0;
+}
+
+.task-page-container {
+  display: flex;
+  height: calc(100vh - 10vh);
+  color: #fff;
+}
+
+.task-sidebar {
+  height: 98vh;
+  border-radius: 0.25em;
+  width: 5%;
+  background-color:  #9E7DF2;
+  transition: width 0.5s;
+  position: fixed;
+  font-family: 'Lexend', sans-serif;
+}
+
+.task-sidebar-expanded {
+  width: 20%;
+}
+
+.menu-icon {
+  cursor: pointer;
+}
+
+.task-main {
+  background-color: #e3e3e3ac;
+  width: 100%;
+  height: 98vh;
+  transition: margin-left 0.5s;
+}
+
+.task-main-expanded {
+  margin-left: 20%;
+}
+
+.task-item {
+  background-color: #fff;
+  color: #333;
+  padding: 2vw;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+
+.task-item .task-title {
+  font-weight: 600;
+}
+
+.task-item .task-time {
+  font-weight: 400;
+}
+
+.task-item .task-status {
+  font-weight: 400;
+}
+
+.task-item .task-actions a {
+  margin-right: 10px;
+}
+
+.task-sidebar .sidebar-content .sidebar-item {
+  display: flex;
+  align-items: center;
+}
+
+.task-sidebar .sidebar-content .sidebar-item .icon {
+  margin-right: 10px;
+}
+
+.task-sidebar .sidebar-content .sidebar-item .text {
+  display: none;
+}
+
+.task-sidebar-expanded .sidebar-content .sidebar-item .text {
+  display: inline;
+}
+
+.create-task-btn {
+  display: block;
+  margin-top: 10px;
+}
+
+.today-icon {
+  background-image: url('today.svg');
+  background-size: cover;
+  margin: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.alltasks-icon {
+  background-image: url('all_tasks.svg');
+  background-size: cover;
+  margin: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.settings-icon {
+  background-image: url('settings.svg');
+  background-size: cover;
+  margin: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.user-icon {
+  background-image: url('user.svg');
+  background-size: cover;
+  margin: 1rem;
+  margin-top: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-block;
+}
+
+.menu-icon {
+  background-image: url('menu.svg');
+  background-size: cover;
+  margin: 1rem;
+  margin-top: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-block;
+}
+
+.text-visible {
+  display: inline;
+}
+
+.task-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.task-header-panel {
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  margin-left: 15%;
+  color:#333;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 2vw;
+}
+
+.create-task-btn-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.task-list .task-panel {
+  background-color: #FFFFFF;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+  margin-left: 15%;
+  margin-right: 10%;
+}
+
+.task-list .task-panel:hover {
+  background-color: #f5f5f7;
+}
+
+.task-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.task-title {
+  font-weight: bold;
+  margin: 0;
+  color: #333;
+}
+
+.task-time {
+  color: #999999;
+  margin: 0;
+}
+
+.task-status .icon {
+  background-image: url('complete.svg');
+  background-size: cover;
+  margin: 1rem;
+  margin-top: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-block;
+}
+
+.not-complete-icon {
+  background-image: url('not_complete.svg');
+  background-size: cover;
+  margin: 1rem;
+  margin-top: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-block;
+}
+
+.complete-icon {
+  background-image: url('complete.svg');
+  background-size: cover;
+  margin: 1rem;
+  margin-top: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-block;
+}
+
+.modal-overlay {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000; /* High z-index to ensure it's on top */
+}
+
+.modal-content {
+  display: none; /* Initially hidden */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  min-height: 60%;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001; /* Higher than the overlay */
 }

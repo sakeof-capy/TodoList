@@ -1,40 +1,76 @@
 ﻿@model IEnumerable<TodoList.Data.Domain.TodoListTask>
+
 @{
-    ViewData["Title"] = "Todo List Tasks";
+    Layout = "~/Views/Shared/_TaskLayout.cshtml";
+    ViewData["Title"] = "Task Index";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="task-page-container">
+    <aside class="task-sidebar" id="sidebar">
+        <div class="menu-icon" onclick="toggleSidebar()"></div>
+        <div class="sidebar-content">
+        <a href="@Url.Action("Settings", "User")" class="sidebar-item">
+                <span class="icon user-icon"></span><span class="text">My Profile</span>
+            </a>
+            <a href="@Url.Action("Index", "Task")" class="sidebar-item">
+                <span class="icon today-icon"></span><span class="text">Today’s tasks</span>
+            </a>
+            <a href="@Url.Action("AllTasks", "Task")" class="sidebar-item">
+                <span class="icon alltasks-icon"></span><span class="text">All tasks</span>
+            </a>
+            <a href="@Url.Action("Settings", "User")" class="sidebar-item">
+                <span class="icon settings-icon"></span><span class="text">Settings</span>
+            </a>
+        </div>
+    </aside>
+    <section class="task-main">
+        <div class="task-header-panel">
+            <h2>Today's tasks</h2>
+        
+        </div>
 
-<p>
-    <a asp-action="Create">Create New Task</a>
-</p>
+        <div class="create-task-btn-container">
+            <a href="#" class="create-task-btn">Create Task</a>
+        </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Owner Email</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Due Date</th>
-            <th>Is Complete</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var task in Model)
-        {
-                <tr>
-                    <td>@task.OwnerEmail</td>
-                    <td>@task.Title</td>
-                    <td>@task.Description</td>
-                    <td>@(task.DueDate.HasValue ? task.DueDate.Value.ToString("MM/dd/yyyy") : "-")</td>
-                    <td>@(task.IsComplete ? "Yes" : "No")</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@task.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@task.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@task.Id">Delete</a>
-                    </td>
-                </tr>
-        }
-    </tbody>
-</table>
+
+
+         <div class="task-list">
+             @foreach (var task in Model)
+            {
+                <div class="task-panel" onclick="toggleTaskStatus(this, @task.Id)">
+                    <div class="task-info">
+                        <span class="task-title">@task.Title</span>
+                        <span class="task-time">@task.DueDate?.ToString("MMM dd, h:mm tt") ?? "No due date"</span>
+                    </div>
+                    <div class="task-status">
+                        <span class="icon @(task.IsComplete ? "complete-icon" : "not-complete-icon")"></span>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+        <script>
+    // Assuming you're using jQuery
+    function toggleTaskStatus(element, taskId) {
+        $.ajax({
+            url: '@Url.Action("ToggleTaskStatus", "Task")',
+            type: 'POST',
+            data: { id: taskId },
+            success: function(response) {
+                if(response.success) {
+                    element.classList.toggle('task-complete');
+                    if(response.status) {
+                        element.querySelector('.icon').classList.remove('not-complete-icon');
+                        element.querySelector('.icon').classList.add('complete-icon');
+                    } else {
+                        element.querySelector('.icon').classList.add('not-complete-icon');
+                        element.querySelector('.icon').classList.remove('complete-icon');
+                    }
+                }
+            }
+        });
+    }
+</script>
+</div>
