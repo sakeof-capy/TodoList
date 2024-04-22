@@ -13,7 +13,7 @@ builder.Services.AddDbContext<TodoListDataContext>(options =>
     b => b.MigrationsAssembly("TodoList.Data"))
 );
 
-// Inside ConfigureServices method
+// Configure JWT Authentication
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -40,9 +40,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
-
-app.UseAuthorization();
+app.UseAuthentication();  // Ensures the authentication system is active
+app.UseAuthorization();  // Ensures the authorization system is active
 
 app.MapControllerRoute(
     name: "default",

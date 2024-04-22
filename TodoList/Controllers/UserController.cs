@@ -6,6 +6,7 @@ using TodoList.Data.Application;
 using TodoList.Data.Domain;
 using TodoList.Data.JWT;
 using TodoList.Models;
+using Microsoft.AspNetCore.Authentication;
 
 namespace TodoList.Controllers;
 
@@ -20,6 +21,14 @@ public class UserController : Controller
         _context = context;
         _logger = logger;
     }
+
+public IActionResult Logout()
+{
+    // Remove the JWT cookie by setting its expiration to a past date
+    Response.Cookies.Delete(JWTManager.TOKEN_COOKIES_KEY, new CookieOptions { Expires = DateTime.UtcNow.AddDays(-1) });
+    return RedirectToAction("Index", "User");
+}
+
 
     [HttpGet]
     [AllowAnonymous]

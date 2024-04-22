@@ -21,21 +21,25 @@ public class TaskController : Controller
         _logger = logger;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Index()
+
+[HttpGet]
+public async Task<IActionResult> AllTasks()
+{
+    var currentUserClaims = HttpContext.User.Claims;
+    string userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+    if (string.IsNullOrEmpty(userEmail))
     {
-        var currentUserClaims = HttpContext.User.Claims;
-        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-        if (string.IsNullOrEmpty(userEmail))
-        {
-            return Unauthorized("Email claim not found in JWT token.");
-        }
-
-        var tasks = await _context.Tasks.Where(t => t.OwnerEmail == userEmail).ToListAsync();
-
-        return View(tasks);
+        return Unauthorized("Email claim not found in JWT token.");
     }
+
+    var tasks = await _context.Tasks
+                            .Where(t => t.OwnerEmail == userEmail)
+                            .ToListAsync();  // Fetch all tasks without ordering
+
+    return View(tasks);
+}
+
 
     [HttpGet]
     public IActionResult Create()
@@ -107,6 +111,14 @@ public class TaskController : Controller
         return View(task);
     }
 
+
+[HttpGet]
+public IActionResult Settings()
+{
+    return View();
+}
+
+
     [HttpPost]
     public async Task<IActionResult> Edit(int id, TaskViewModel inputTask)
     {
@@ -138,6 +150,40 @@ public class TaskController : Controller
         return View(inputTask);
     }
 
+public async Task<IActionResult> Index()
+{
+    var currentUserClaims = HttpContext.User.Claims;
+    string userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+    if (string.IsNullOrEmpty(userEmail))
+    {
+        return Unauthorized("Email claim not found in JWT token.");
+    }
+
+    var tasks = await _context.Tasks
+                            .Where(t => t.OwnerEmail == userEmail)
+                            .OrderBy(t => t.IsComplete) // Incomplete tasks first
+                            .ToListAsync();
+
+    return View(tasks);
+}
+
+
+[HttpPost]
+public async Task<IActionResult> ToggleTaskStatus(int id)
+{
+    var task = await _context.Tasks.FindAsync(id);
+    if (task == null)
+    {
+        return Json(new { success = false });
+    }
+
+    task.IsComplete = !task.IsComplete;
+    await _context.SaveChangesAsync();
+    return Json(new { success = true, status = task.IsComplete });
+}
+
+
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
@@ -150,11 +196,22 @@ public class TaskController : Controller
         return View(task);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> DeleteConfirmed(TodoListTask task)
+[HttpPost]
+public async Task<IActionResult> DeleteConfirmed([FromBody] DeleteViewModel model)
+{
+    var task = await _context.Tasks.FindAsync(model.Id);
+    if (task == null)
     {
-        _context.Tasks.Remove(task);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+        return Json(new { success = false });
     }
+    _context.Tasks.Remove(task);
+    await _context.SaveChangesAsync();
+    return Json(new { success = true });
+}
+
+public class DeleteViewModel
+{
+    public int Id { get; set; }
+}
+
 }

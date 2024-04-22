@@ -1,25 +1,25 @@
-﻿@model IEnumerable<TodoList.Data.Domain.TodoListTask>
+@model IEnumerable<TodoList.Data.Domain.TodoListTask>
 
 @{
     Layout = "~/Views/Shared/_TaskLayout.cshtml";
-    ViewData["Title"] = "Task Index";
-    var todayTaskActiveClass = ViewData["Title"].Equals("Task Index") ? "today-active" : "";
+    ViewData["Title"] = "All Tasks";
+   var allTasksActiveClass = ViewData["Title"].Equals("All Tasks") ? "today-active" : "";
 }
 
 <div class="task-page-container">
     <aside class="task-sidebar" id="sidebar">
         <div class="menu-icon" onclick="toggleSidebar()"></div>
         <div class="sidebar-content">
-
-            <a href="@Url.Action("Index", "Task")" class="sidebar-item @todayTaskActiveClass">
-            <span class="icon today-icon"></span><span class="text">Today’s tasks</span>
-        </a>
-            <a href="@Url.Action("AllTasks", "Task")" class="sidebar-item">
-    <span class="icon alltasks-icon"></span><span class="text">All tasks</span>
-</a>
+            <a href="@Url.Action("Index", "Task")" class="sidebar-item">
+                <span class="icon today-icon"></span><span class="text">Today’s tasks</span>
+            </a>
+            <a href="@Url.Action("AllTasks", "Task")" class="sidebar-item @allTasksActiveClass">
+                <span class="icon alltasks-icon"></span><span class="text">All tasks</span>
+            </a>
            <a href="@Url.Action("Settings", "Task")" class="sidebar-item">
                 <span class="icon settings-icon"></span><span class="text">Settings</span>
 </a>
+
 
 <form asp-action="Logout" asp-controller="User" method="post">
     @Html.AntiForgeryToken()
@@ -32,10 +32,10 @@
 
         </div>
     </aside>
-    <section class="task-main">
 
+    <section class="task-main">
         <div class="task-header-panel">
-            <h2 class="task-heading">Today's Tasks</h2>
+            <h2 class="task-heading">All Tasks</h2>
         
         </div>
 

@@ -117,6 +117,10 @@ header {
   color: #fff;
 }
 
+.task-sidebar .sidebar-content .today-active {
+  background-color: #6f42c1; /* Darker background color */
+}
+
 .task-sidebar {
   height: 98vh;
   border-radius: 0.25em;
@@ -193,10 +197,24 @@ header {
 }
 
 .create-task-btn {
+  font-size: 100%;
+  font-family: 'Lexend', sans-serif;
+  background-color: white;
+  color: #9E7DF2;
+  border-radius: 0.25em;
+  border: 1px solid white;
+  padding: 12px 20px;
+  text-align: center;
   display: block;
-  margin-top: 10px;
+  text-decoration: none; /* Remove underline from the anchor */
+  width: 10vw; /* Allow button size to fit the content */
 }
 
+.create-task-btn:hover {
+  background-color: #9E7DF2;
+  color: white;
+  text-decoration: none; /* Remove underline from the anchor on hover */
+}
 .today-icon {
   background-image: url('today.svg');
   background-size: cover;
@@ -241,6 +259,51 @@ header {
   display: inline-block;
 }
 
+.task-sidebar .sidebar-content .today-active {
+  background-color: #6f42c1; /* Darker purple for active items */
+}
+
+
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  width: 20px;
+}
+
+.task-panel {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.exit-icon {
+  background-image: url('exit.svg');
+  background-size: cover;
+  margin: 1rem;
+  margin-top: 20rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-block;
+}
+
 .text-visible {
   display: inline;
 }
@@ -256,20 +319,33 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.create-task-btn-container {
+  text-align: center;
+  padding-bottom: 5vh;
+
+}
 .task-header-panel {
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
   margin-left: 15%;
+  margin-top: 2vw;
   color:#333;
   font-family: 'Segoe UI', sans-serif;
   font-size: 2vw;
+  font-weight: 700;
+}
+.dark-mode .task-heading {
+  color: #ffffff; /* color for dark mode */
 }
 
-.create-task-btn-container {
-  text-align: center;
-  margin-bottom: 20px;
+.task-heading {
+  font-weight: 600;
+  font-size: 2rem;
+  color: #333; /* default color for light mode */
 }
+
+
 
 .task-list .task-panel {
   background-color: #FFFFFF;
@@ -314,48 +390,104 @@ header {
   display: inline-block;
 }
 
-.not-complete-icon {
-  background-image: url('not_complete.svg');
-  background-size: cover;
-  margin: 1rem;
-  margin-top: 2rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: inline-block;
+.icon-incomplete {
+  opacity: 0.5; /* Incomplete tasks will have faded icons */
 }
 
-.complete-icon {
-  background-image: url('complete.svg');
-  background-size: cover;
-  margin: 1rem;
-  margin-top: 2rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: inline-block;
+.icon-complete {
+  opacity: 1; /* Completed tasks will have full opacity icons */
 }
 
-.modal-overlay {
-  display: none; /* Initially hidden */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000; /* High z-index to ensure it's on top */
+
+.settings-heading {
+  margin-right: auto;
+  color: #333;
+  font-weight: 600;
+  font-size: 2rem;
 }
 
-.modal-content {
-  display: none; /* Initially hidden */
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60%;
-  min-height: 60%;
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1001; /* Higher than the overlay */
+.dark-mode .settings-heading {
+  color: #ffffff;
+}
+
+.dark-mode-label {
+  color: #333;
+  font-weight: 300;
+  margin-right: 15px;
+  
+  font-size: 1.5rem;
+}
+
+.dark-mode .dark-mode-label {
+  color: #ffffff;
+}
+
+.toggle-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  outline: none;
+}
+
+.icon-light-mode {
+  margin-top: 10px;
+  background-image: url('sun.svg');
+}
+
+.icon-dark-mode {
+  margin-top: 10px;
+  background-image: url('moon.svg');
+}
+
+.dark-mode .task-sidebar {
+  background-color: #FFC300;
+}
+
+.dark-mode {
+  background-color: #424242;
+  color: #e0e0e0;
+}
+
+.dark-mode .right-panel, .dark-mode .login-container, .dark-mode .task-sidebar, .dark-mode .task-main {
+  background-color: #333;
+}
+
+.dark-mode .task-panel {
+  background-color: #424242;
+  color: #e0e0e0;
+}
+
+.sidebar-item.active {
+  background-color: #6f42c1;
+}
+
+.dark-mode .task-panel:hover {
+  background-color: #535353;
+}
+
+/* Ensure the dark mode label and toggle button are on the same axis */
+.dark-mode-toggle {
+
+  display: flex;
+  align-items: center;
+}
+
+.form-control[type="date"] {
+  font-size: 100%;
+  border: 1px solid #CCC;
+  padding: .5em 1em;
+  border-radius: .25em;
+  margin-bottom: 1em;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}
+
+.completed-task {
+  opacity: 0.6; /* Optional: fade the task to indicate it's completed */
 }

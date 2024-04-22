@@ -1,0 +1,58 @@
+@{
+    Layout = "~/Views/Shared/_TaskLayout.cshtml";
+    ViewData["Title"] = "Settings";
+}
+
+<div class="task-page-container">
+    <aside class="task-sidebar" id="sidebar">
+        <div class="menu-icon" onclick="toggleSidebar()"></div>
+        <div class="sidebar-content">
+            <a href="@Url.Action("Index", "Task")" class="sidebar-item">
+                <span class="icon today-icon"></span><span class="text">Today’s tasks</span>
+            </a>
+            <a href="@Url.Action("AllTasks", "Task")" class="sidebar-item">
+                <span class="icon alltasks-icon"></span><span class="text">All tasks</span>
+            </a>
+            <a href="@Url.Action("Settings", "Task")" class="sidebar-item active">
+                <span class="icon settings-icon"></span><span class="text">Settings</span>
+            </a>
+
+            <form asp-action="Logout" asp-controller="User" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="sidebar-item" style="background: none; border: none; cursor: pointer;">
+        <span class="icon exit-icon"></span><span class="text"> </span>
+    </button>
+</form>
+
+
+        </div>
+    </aside>
+    <section class="task-main">
+        <div class="task-header-panel">
+            <h2 class="settings-heading">Settings</h2>
+            <label class="dark-mode-label" for="toggleDarkMode">Dark mode</label>
+            <button class="toggle-button" id="toggleDarkMode"></button>
+        </div>
+    </section>
+</div>
+
+
+<script>
+    const darkModeToggle = document.getElementById('toggleDarkMode');
+    const setDarkMode = (isDarkMode) => {
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        darkModeToggle.classList.toggle('icon-light-mode', !isDarkMode);
+        darkModeToggle.classList.toggle('icon-dark-mode', isDarkMode);
+        localStorage.setItem('darkMode', isDarkMode);
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeOn = localStorage.getItem('darkMode') === 'true';
+        setDarkMode(darkModeOn);
+    });
+
+    darkModeToggle.addEventListener('click', function() {
+        const isDarkMode = !document.body.classList.contains('dark-mode');
+        setDarkMode(isDarkMode);
+    });
+</script>

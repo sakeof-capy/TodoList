@@ -27,6 +27,19 @@
                 element.classList.toggle('text-visible');
             });
         }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+});
+
+function toggleDarkMode() {
+    var isDarkMode = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode);
+}
+
     </script>
 </body>
 </html>
