@@ -10,10 +10,10 @@ public class TaskViewModel
     public string Title { get; set; }
 
     [StringLength(500, ErrorMessage = "Description cannot be more than 500 characters long.")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public bool IsComplete { get; set; } = false;
+    public bool IsComplete { get; set; }
 
     [DataType(DataType.Date)]
-    public DateTime DueDate { get; set; } = DateTime.UtcNow.Date;
+    public DateTime DueDate { get; set; }
 }

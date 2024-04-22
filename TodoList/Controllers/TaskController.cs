@@ -21,25 +21,22 @@ public class TaskController : Controller
         _logger = logger;
     }
 
-
-[HttpGet]
-public async Task<IActionResult> AllTasks()
-{
-    var currentUserClaims = HttpContext.User.Claims;
-    string userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-    if (string.IsNullOrEmpty(userEmail))
+    [HttpGet]
+    public async Task<IActionResult> AllTasks()
     {
-        return Unauthorized("Email claim not found in JWT token.");
+        var currentUserClaims = HttpContext.User.Claims;
+        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized("Email claim not found in JWT token.");
+        }
+
+        var tasks = await _context.Tasks
+                                .Where(t => t.OwnerEmail == userEmail)
+                                .ToListAsync();  // Fetch all tasks without ordering
+        return View(tasks);
     }
-
-    var tasks = await _context.Tasks
-                            .Where(t => t.OwnerEmail == userEmail)
-                            .ToListAsync();  // Fetch all tasks without ordering
-
-    return View(tasks);
-}
-
 
     [HttpGet]
     public IActionResult Create()
@@ -60,12 +57,18 @@ public async Task<IActionResult> AllTasks()
                 return Unauthorized("Email claim not found in JWT token.");
             }
 
+            var dateWrongDay = inputTask.DueDate;
+            var nextDay = dateWrongDay.AddDays(1);
+            var universalTimeDate = nextDay.Month != dateWrongDay.Month
+                ? new DateTime(nextDay.Year, nextDay.Month, 1).AddMonths(1).AddDays(-1).ToUniversalTime() // Go to the last day of the next month
+                : nextDay.ToUniversalTime();
+
             var task = new TodoListTask
             {
                 OwnerEmail = userEmail,
                 Title = inputTask.Title,
                 Description = inputTask.Description,
-                DueDate = DateTime.Now.ToUniversalTime(),
+                DueDate = universalTimeDate,
                 IsComplete = inputTask.IsComplete,
             };
 
@@ -111,13 +114,11 @@ public async Task<IActionResult> AllTasks()
         return View(task);
     }
 
-
-[HttpGet]
-public IActionResult Settings()
-{
-    return View();
-}
-
+    [HttpGet]
+    public IActionResult Settings()
+    {
+        return View();
+    }
 
     [HttpPost]
     public async Task<IActionResult> Edit(int id, TaskViewModel inputTask)
@@ -150,38 +151,42 @@ public IActionResult Settings()
         return View(inputTask);
     }
 
-public async Task<IActionResult> Index()
-{
-    var currentUserClaims = HttpContext.User.Claims;
-    string userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-    if (string.IsNullOrEmpty(userEmail))
+    public async Task<IActionResult> Index()
     {
-        return Unauthorized("Email claim not found in JWT token.");
+        var currentUserClaims = HttpContext.User.Claims;
+        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized("Email claim not found in JWT token.");
+        }
+
+        var tasks = await _context.Tasks
+            .Where(t => t.OwnerEmail == userEmail)
+            .Where(t => t.DueDate.HasValue &&
+                        t.DueDate.Value.Year == DateTime.UtcNow.Year &&
+                        t.DueDate.Value.Month == DateTime.UtcNow.Month &&
+                        t.DueDate.Value.Day == DateTime.UtcNow.Day + 1)
+            .OrderBy(t => t.IsComplete) // Incomplete tasks first
+            .ToListAsync();
+
+        return View(tasks);
     }
 
-    var tasks = await _context.Tasks
-                            .Where(t => t.OwnerEmail == userEmail)
-                            .OrderBy(t => t.IsComplete) // Incomplete tasks first
-                            .ToListAsync();
 
-    return View(tasks);
-}
-
-
-[HttpPost]
-public async Task<IActionResult> ToggleTaskStatus(int id)
-{
-    var task = await _context.Tasks.FindAsync(id);
-    if (task == null)
+    [HttpPost]
+    public async Task<IActionResult> ToggleTaskStatus(int id)
     {
-        return Json(new { success = false });
-    }
+        var task = await _context.Tasks.FindAsync(id);
+        if (task == null)
+        {
+            return Json(new { success = false });
+        }
 
-    task.IsComplete = !task.IsComplete;
-    await _context.SaveChangesAsync();
-    return Json(new { success = true, status = task.IsComplete });
-}
+        task.IsComplete = !task.IsComplete;
+        await _context.SaveChangesAsync();
+        return Json(new { success = true, status = task.IsComplete });
+    }
 
 
     [HttpGet]
@@ -196,22 +201,21 @@ public async Task<IActionResult> ToggleTaskStatus(int id)
         return View(task);
     }
 
-[HttpPost]
-public async Task<IActionResult> DeleteConfirmed([FromBody] DeleteViewModel model)
-{
-    var task = await _context.Tasks.FindAsync(model.Id);
-    if (task == null)
+    [HttpPost]
+    public async Task<IActionResult> DeleteConfirmed([FromBody] DeleteViewModel model)
     {
-        return Json(new { success = false });
+        var task = await _context.Tasks.FindAsync(model.Id);
+        if (task == null)
+        {
+            return Json(new { success = false });
+        }
+        _context.Tasks.Remove(task);
+        await _context.SaveChangesAsync();
+        return Json(new { success = true });
     }
-    _context.Tasks.Remove(task);
-    await _context.SaveChangesAsync();
-    return Json(new { success = true });
-}
 
-public class DeleteViewModel
-{
-    public int Id { get; set; }
-}
-
+    public class DeleteViewModel
+    {
+        public int Id { get; set; }
+    }
 }

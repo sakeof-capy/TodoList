@@ -12,7 +12,7 @@ using TodoList.Data.Application;
 namespace TodoList.Data.Migrations
 {
     [DbContext(typeof(TodoListDataContext))]
-    [Migration("20240406225204_TodoList")]
+    [Migration("20240422203548_TodoList")]
     partial class TodoList
     {
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace TodoList.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<DateTimeOffset?>("DueDate")
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsComplete")

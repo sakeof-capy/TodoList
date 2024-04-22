@@ -19,6 +19,6 @@ public class TodoListTask
     [StringLength(50, ErrorMessage = "Description cannot be more than 50 characters long.")]
     public string? Description { get; set; }
 
-    public DateTimeOffset? DueDate { get; set; } = null;
+    public DateTime? DueDate { get; set; } = null;
     public bool IsComplete { get; set; } = false;
 }

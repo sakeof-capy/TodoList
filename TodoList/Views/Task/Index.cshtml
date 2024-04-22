@@ -52,7 +52,7 @@
     <div class="task-panel @(task.IsComplete ? "completed-task" : "")" data-task-id="@task.Id">
         <div class="task-info" onclick="editTask(@task.Id)">
             <span class="task-title @(task.IsComplete ? "strikethrough" : "")">@task.Title</span>
-            <span class="task-time">@task.DueDate?.ToString("MMM dd, h:mm tt") ?? "No due date"</span>
+                <span class="task-time">@((task.DueDate != null) ? task.DueDate.Value.ToString("MMMM dd, yyyy") : "No due date")</span>
         </div>
         <div class="task-status" onclick="toggleTaskStatus(event, @task.Id)">
             <span class="icon @(task.IsComplete ? "complete-icon" : "not-complete-icon")"></span>

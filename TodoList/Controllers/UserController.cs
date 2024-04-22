@@ -22,12 +22,12 @@ public class UserController : Controller
         _logger = logger;
     }
 
-public IActionResult Logout()
-{
-    // Remove the JWT cookie by setting its expiration to a past date
-    Response.Cookies.Delete(JWTManager.TOKEN_COOKIES_KEY, new CookieOptions { Expires = DateTime.UtcNow.AddDays(-1) });
-    return RedirectToAction("Index", "User");
-}
+    public IActionResult Logout()
+    {
+        // Remove the JWT cookie by setting its expiration to a past date
+        Response.Cookies.Delete(JWTManager.TOKEN_COOKIES_KEY, new CookieOptions { Expires = DateTime.UtcNow.AddDays(-1) });
+        return RedirectToAction("Index", "User");
+    }
 
 
     [HttpGet]
@@ -45,7 +45,7 @@ public IActionResult Logout()
 
         if (user == null)
         {
-            return RedirectToAction(nameof(Index)); // TODO: notify about the error login
+            return RedirectToAction(nameof(Index)); 
         }
 
         var token = JWTManager.GenerateJwtToken(user);

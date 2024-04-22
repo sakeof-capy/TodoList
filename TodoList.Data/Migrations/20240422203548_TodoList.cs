@@ -21,7 +21,7 @@ namespace TodoList.Data.Migrations
                     OwnerEmail = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
                     Title = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    DueDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsComplete = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
