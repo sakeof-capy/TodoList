@@ -1,25 +1,25 @@
 ﻿@model TodoList.Models.TaskViewModel
 @{
-    ViewData["Title"] = "Edit Todo List Task";
-     Layout = "~/Views/Shared/_TaskLayout.cshtml";
-
+    ViewData["Title"] = "Edit Task";
+    Layout = "~/Views/Shared/_TaskLayout.cshtml";
 }
-<h1>Edit Todo List Task</h1>
-
-<form asp-action="Edit">
-    <div>
+<div class="task-header-panel">
+    <h1 class="task-heading">Edit Todo List Task</h1>
+</div>
+<form asp-action="Edit" method="post" class="form-group">
+    <div class="form-control">
         <label asp-for="Title">Title:</label>
-        <input asp-for="Title" class="form-control" required />
+        <input asp-for="Title" class="input-field" required />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-    <div>
+    <div class="form-control">
         <label asp-for="Description">Description:</label>
-        <input asp-for="Description" class="form-control" />
+        <textarea asp-for="Description" class="input-field"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    <div>
+    <div class="form-control">
         <label asp-for="IsComplete">Is Complete:</label>
-        <input asp-for="IsComplete" class="form-check-input" />
+        <input asp-for="IsComplete" type="checkbox" class="form-check-input" />
         <span asp-validation-for="IsComplete" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Save Changes</button>

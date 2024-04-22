@@ -21,22 +21,26 @@ public class TaskController : Controller
         _logger = logger;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> AllTasks()
+  [HttpGet]
+public async Task<IActionResult> AllTasks()
+{
+    var currentUserClaims = HttpContext.User.Claims;
+    string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+    if (string.IsNullOrEmpty(userEmail))
     {
-        var currentUserClaims = HttpContext.User.Claims;
-        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-        if (string.IsNullOrEmpty(userEmail))
-        {
-            return Unauthorized("Email claim not found in JWT token.");
-        }
-
-        var tasks = await _context.Tasks
-                                .Where(t => t.OwnerEmail == userEmail)
-                                .ToListAsync();  // Fetch all tasks without ordering
-        return View(tasks);
+        return Unauthorized("Email claim not found in JWT token.");
     }
+
+    var tasks = await _context.Tasks
+        .Where(t => t.OwnerEmail == userEmail)
+        .OrderBy(t => t.IsComplete) // Not completed tasks first
+        .ThenBy(t => t.DueDate)     // Then by earliest due date
+        .ToListAsync();
+
+    return View(tasks);
+}
+
 
     [HttpGet]
     public IActionResult Create()
@@ -151,27 +155,27 @@ public class TaskController : Controller
         return View(inputTask);
     }
 
-    public async Task<IActionResult> Index()
+   public async Task<IActionResult> Index()
+{
+    var currentUserClaims = HttpContext.User.Claims;
+    string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+    if (string.IsNullOrEmpty(userEmail))
     {
-        var currentUserClaims = HttpContext.User.Claims;
-        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-        if (string.IsNullOrEmpty(userEmail))
-        {
-            return Unauthorized("Email claim not found in JWT token.");
-        }
-
-        var tasks = await _context.Tasks
-            .Where(t => t.OwnerEmail == userEmail)
-            .Where(t => t.DueDate.HasValue &&
-                        t.DueDate.Value.Year == DateTime.UtcNow.Year &&
-                        t.DueDate.Value.Month == DateTime.UtcNow.Month &&
-                        t.DueDate.Value.Day == DateTime.UtcNow.Day + 1)
-            .OrderBy(t => t.IsComplete) // Incomplete tasks first
-            .ToListAsync();
-
-        return View(tasks);
+        return Unauthorized("Email claim not found in JWT token.");
     }
+
+    DateTime todayUtc = DateTime.UtcNow.Date; // Gets today's date in UTC and removes time part
+
+    var tasks = await _context.Tasks
+        .Where(t => t.OwnerEmail == userEmail && t.DueDate.HasValue &&
+                    t.DueDate.Value.Date == todayUtc) // Only today's tasks
+        .OrderBy(t => t.IsComplete) // Incomplete tasks first
+        .ThenBy(t => t.DueDate)     // Then by earliest due date
+        .ToListAsync();
+
+    return View(tasks);
+}
 
 
     [HttpPost]

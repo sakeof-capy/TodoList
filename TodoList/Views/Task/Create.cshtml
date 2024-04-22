@@ -1,24 +1,25 @@
 ﻿@model TodoList.Models.TaskViewModel
 @{
     Layout = "~/Views/Shared/_TaskLayout.cshtml";
-
+    ViewData["Title"] = "Create Task";
 }
-<h1>Create Todo List Task</h1>
-
-<form asp-action="Create" method="post">
-    <div>
+<div class="task-header-panel">
+    <h1 class="task-heading">Create Todo List Task</h1>
+</div>
+<form asp-action="Create" method="post" class="form-group">
+    <div class="form-control">
         <label asp-for="Title">Title:</label>
-        <input asp-for="Title" class="form-control" required />
+        <input asp-for="Title" class="input-field" required />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-    <div>
+    <div class="form-control">
         <label asp-for="Description">Description:</label>
-        <input asp-for="Description" class="form-control" />
+        <textarea asp-for="Description" class="input-field"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    <div>
+    <div class="form-control">
         <label asp-for="DueDate">Due Date:</label>
-        <input asp-for="DueDate" type="date" class="form-control" min="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+        <input asp-for="DueDate" type="date" class="input-field" min="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
         <span asp-validation-for="DueDate" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Create Task</button>
