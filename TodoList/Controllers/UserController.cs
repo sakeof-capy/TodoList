@@ -60,12 +60,14 @@ public class UserController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Create()
     {
         return View();
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Create(UserViewModel inputUser)
     {
         if (ModelState.IsValid)

@@ -155,27 +155,27 @@ public async Task<IActionResult> AllTasks()
         return View(inputTask);
     }
 
-   public async Task<IActionResult> Index()
-{
-    var currentUserClaims = HttpContext.User.Claims;
-    string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-    if (string.IsNullOrEmpty(userEmail))
+    public async Task<IActionResult> Index()
     {
-        return Unauthorized("Email claim not found in JWT token.");
+        var currentUserClaims = HttpContext.User.Claims;
+        string? userEmail = currentUserClaims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized("Email claim not found in JWT token.");
+        }
+
+        DateTime todayUtc = DateTime.UtcNow.Date; // Gets today's date in UTC and removes time part
+
+        var tasks = await _context.Tasks
+            .Where(t => t.OwnerEmail == userEmail && t.DueDate.HasValue &&
+                        t.DueDate.Value.Date == todayUtc) // Only today's tasks
+            .OrderBy(t => t.IsComplete) // Incomplete tasks first
+            .ThenBy(t => t.DueDate)     // Then by earliest due date
+            .ToListAsync();
+
+        return View(tasks);
     }
-
-    DateTime todayUtc = DateTime.UtcNow.Date; // Gets today's date in UTC and removes time part
-
-    var tasks = await _context.Tasks
-        .Where(t => t.OwnerEmail == userEmail && t.DueDate.HasValue &&
-                    t.DueDate.Value.Date == todayUtc) // Only today's tasks
-        .OrderBy(t => t.IsComplete) // Incomplete tasks first
-        .ThenBy(t => t.DueDate)     // Then by earliest due date
-        .ToListAsync();
-
-    return View(tasks);
-}
 
 
     [HttpPost]
